@@ -108,6 +108,9 @@ MAKE_STUB_LIB	= @MAKE_STUB_LIB@
 OBJEXT		= @OBJEXT@
 RANLIB		= @RANLIB@
 RANLIB_STUB	= @RANLIB_STUB@
+RC		= @RC@
+#RES		= @RES@
+RES		= res.o
 SHLIB_CFLAGS	= @SHLIB_CFLAGS@
 SHLIB_LD	= @SHLIB_LD@
 SHLIB_LD_LIBS	= @SHLIB_LD_LIBS@
@@ -256,9 +259,9 @@ depend:
 # source files above.
 #========================================================================
 
-$(PKG_LIB_FILE): $(PKG_OBJECTS)
+$(PKG_LIB_FILE): $(PKG_OBJECTS) tcliocp.$(RES)
 	-rm -f $(PKG_LIB_FILE)
-	${MAKE_LIB}
+	${MAKE_LIB} tcliocp.$(RES)
 	$(RANLIB) $(PKG_LIB_FILE)
 
 $(PKG_STUB_LIB_FILE): $(PKG_STUB_OBJECTS)
@@ -285,6 +288,14 @@ VPATH = $(srcdir):$(srcdir)/win
 
 .c.@OBJEXT@:
 	$(COMPILE) -c `@CYGPATH@ $<` -o $@
+
+.rc.$(RES):
+	#$(RC) @RC_OUT@ $@ @RC_TYPE@ @RC_DEFINES@ @RC_INCLUDE@ "$(srcdir)"
+	$(RC) -o $@ --include "$(srcdir)" --include "$(srcdir)/win" `@CYGPATH@ $<`
+
+tcliocp.$(RES): $(srcdir)/win/tcliocp.rc
+	$(RC) -o tcliocp.$(RES) --include "$(srcdir)" --include "$(srcdir)/win" "$(srcdir)/win/tcliocp.rc"
+
 
 #========================================================================
 # Distribution creation
@@ -340,7 +351,7 @@ dist: dist-clean
 
 clean:  
 	-test -z "$(BINARIES)" || rm -f $(BINARIES)
-	-rm -f *.$(OBJEXT) core *.core
+	-rm -f *.$(OBJEXT) *.$(RES) core *.core
 	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean: clean
@@ -414,6 +425,7 @@ install-bin-binaries: binaries
 	done
 
 .SUFFIXES: .c .$(OBJEXT)
+.SUFFIXES: .rc
 
 Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
 	cd $(top_builddir) \
