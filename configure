@@ -1374,7 +1374,7 @@ Optional Features:
   --enable-64bit-vis      enable 64bit Sparc VIS support (default: off)
   --disable-rpath         disable rpath support (default: on)
   --enable-wince          enable Win/CE support (where applicable)
-  --enable-bluetooth      enable of bluetooth support (default: off)
+  --enable-bluetooth      enable of bluetooth support (default: yes)
   --enable-symbols        build with debugging symbols (default: off)
 
 Optional Packages:
@@ -8495,13 +8495,18 @@ $as_echo_n "checking enable of bluetooth support... " >&6; }
 if test "${enable_bluetooth+set}" = set; then :
   enableval=$enable_bluetooth; tcl_ok=$enableval
 else
-  tcl_ok=no
+  tcl_ok=yes
 fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: \"$tcl_ok\"" >&5
 $as_echo "\"$tcl_ok\"" >&6; }
-if test "$tcl_ok" = "yes"; then
-    CFLAGS="${CFLAGS} -DIOCP_ENABLE_BLUETOOTH"
+if test "$tcl_ok" = "no"; then
+    CFLAGS="${CFLAGS} -DIOCP_ENABLE_BLUETOOTH=0"
+elif test "$tcl_ok" = "lazy"; then
+    CFLAGS="${CFLAGS} -DIOCP_ENABLE_BLUETOOTH=2"
+elif test "$tcl_ok" != "yes"; then
+    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: unsupporte value $tcl_ok for enable-bluetooth, expected yes, no or lazy" >&5
+$as_echo "$as_me: WARNING: unsupporte value $tcl_ok for enable-bluetooth, expected yes, no or lazy" >&2;}
 fi
 
 # Set the architecture specific subdirectory. This extension is Windows only so
